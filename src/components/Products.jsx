@@ -1,31 +1,43 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { add } from "../store/cartSlice";
-
+import { STATUS,fetchProduct } from "../store/productSlice";
 
 const Products = () => {
-  const [products, setProducts] = useState([]);
-
+  // const [products, setProducts] = useState([]);
+  
+  //useSelector hook with destructuring
+  const {data : products, status} = useSelector(state => state.product)
+  const dispatcher = useDispatch();
   useEffect(() => {
-    const getProducts = async () => {
-      const response = await axios.get("https://fakestoreapi.com/products");
-      setProducts(response.data);
-    };
+    // const getProducts = async () => {
+    //   try {
+    //     const response = await axios.get("https://fakestoreapi.com/products");
+    //     setProducts(response.data);
+    //   } catch {
+    //     console.log("Getting Error From Api");
+    //   }
+    // };
 
-    getProducts();
+    // getProducts();
+
+    dispatcher(fetchProduct())
   }, []);
+     
+  //Conditional rendering
+      if (status === STATUS.LOADING) {
+        return <h2>Loading</h2>
+      }
 
-  const dispatcher = useDispatch()
-
+    if (status === STATUS.ERROR) {
+        return <h2>Something went wrong</h2>
+    }
   const addToCart = (product) => {
-    
-    dispatcher(add(product))
+    dispatcher(add(product));
   };
 
   return (
     <div className="productsWrapper">
-      
       {products.map((product) => {
         return (
           <div className="card">
